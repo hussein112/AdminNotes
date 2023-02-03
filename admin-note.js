@@ -24,31 +24,25 @@ class Note{
 
 class NotesForm{
 
-    static flush(){
-        document.getElementById("an-title").value = "";
-        document.getElementById("an-content").value = "";
-        if(document.getElementById("an-title").disabled = true){
-            document.getElementById("an-title").disabled = false;
-        }
-
-        let errors = document.querySelectorAll("an-error");
-
-        if(errors != null){
-            errors.forEach(error => {
-                error.remove();
-            });
-        }
+    static title = document.getElementById("an-title");
+    static content = document.getElementById("an-content");
+    static important = document.getElementById("an-important");
 
 
-        if(document.getElementById('an-cancel')){
-            document.getElementById('an-cancel').remove();
-            const update = document.getElementById('an-update');
+    static getBtn(btn){
+        return document.getElementById(`an-${btn}`);
+    }
 
-            const saveBtn = document.createElement("button");
-            saveBtn.setAttribute("id", "an-save");
-            saveBtn.setAttribute("class", "btn btn-primary mt-2");
-            saveBtn.innerText = "Save";
-            saveBtn.addEventListener("click", (e)=>{
+    static createSaveBtn(){
+        const button = document.createElement("button");
+        button.setAttribute("id", `an-save`);
+        button.setAttribute("class", "btn btn-primary mt-2");
+        button.innerText = "Save";
+        document.getElementById("an-check").after(button);
+        
+        setTimeout(function(){
+            let s = document.getElementById("an-save");
+            s.addEventListener("click", function(e){
                 e.preventDefault();
                 e.stopPropagation();
             
@@ -64,11 +58,67 @@ class NotesForm{
                 const saveNote = new NoteController(note);
                 saveNote.store();
             });
+        }, 100);
+    }
 
-            update.after(saveBtn);
-            update.remove();
+    static createBtn(btn){
+        const button = document.createElement("button");
+        button.setAttribute("id", `an-${btn}`);
+        button.setAttribute("class", "btn btn-primary mt-2");
+        button.innerText = btn;
+        document.getElementById("an-check").after(button);
+        return document.getElementById(`an-${btn}`);
+    }
+
+    static flush(){
+        this.title.value = "";
+        this.content.value = "";
+        this.important.checked = false;
+        if(this.title.disabled = true){
+            this.title.disabled = false;
+        }
+
+        let errors = document.querySelectorAll(".an-error");
+
+        if(errors != null){
+            errors.forEach(error => {
+                error.remove();
+            });
+        }
+
+
+        if(this.getBtn('cancel') != null){
+            this.getBtn('cancel').remove();
+        }
+
+        if(this.getBtn('update') != null){
+            this.getBtn("update").remove();
+        }
+
+    }
+
+
+    static flushErrors(){
+        let errors = document.querySelectorAll(".an-error");
+        if(errors != null){
+            errors.forEach(error => {
+                error.remove();
+            });
         }
     }
+
+
+
+    static fill(){
+        this.createSaveBtn();
+    }
+
+    static flushThenFill(){
+        this.flush();
+        this.fill();
+    }
+
+    
 }
 
 class NoteController{
@@ -92,6 +142,7 @@ class NoteController{
                     important = true;
                 }else{
                     title = entry_title.slice(3);
+                    important = false;
                 }
                 this.prototype.renderAll(title, entry_content, important);
             }
@@ -115,13 +166,102 @@ class NoteController{
     }
 
 
-    static update(content, content_id){
+    static updateView(content, content_id, important = false){
         document.getElementById(content_id).children[0].innerText = content;
+        if(important){
+            document.getElementById(content_id).previousSibling.children[0].classList.add("bg-danger");
+            document.getElementById(content_id).previousSibling.children[0].classList.add("text-light");
+        }
     }
 
 
-    delete(){
+    static update(deleteb, edit){
+        let title = "";
+        let rendered_title = "";
+        if(deleteb.previousSibling.previousSibling.classList.contains("bg-danger")){
+            title = `an-imp__${deleteb.parentElement.innerText}`;
+            rendered_title = title.slice(8);
+        }else{
+            title = `an-${edit.previousElementSibling.innerText}`;
+            rendered_title = title.slice(3);
+        }
+        
+        // Fill the form
+        const item = localStorage.getItem(title);
+        NotesForm.title.value = rendered_title;
+        NotesForm.title.disabled = true;
+        if(title.includes("imp__")){
+            NotesForm.important.checked = true;
+        }else{
+            NotesForm.important.checked = false;
+        }
 
+        let content = document.getElementById("an-content");
+        content.value = item;
+
+        // Add Action Buttons
+        const updateBtn = document.createElement("button");
+        updateBtn.setAttribute("id", "an-update");
+        updateBtn.setAttribute("class", "btn btn-danger mt-2 mx-2");
+        updateBtn.innerText = "Update";
+
+        const saveBtn = document.getElementById("an-save");
+        if(saveBtn != null){
+            saveBtn.after(updateBtn);
+            saveBtn.remove();
+
+            const cancel = document.createElement("button");
+            cancel.setAttribute("id", "an-cancel");
+            cancel.setAttribute("class", "btn btn-primary mt-2 mx-2");
+            cancel.innerText = "Cancel";
+            updateBtn.after(cancel);
+
+            cancel.addEventListener("click", (e)=>{
+                e.preventDefault();
+                updateBtn.remove();
+                NotesForm.flushThenFill();
+
+                cancel.after(saveBtn);
+                cancel.remove();
+            });
+        }else{
+            document.getElementById("an-update").after(updateBtn);
+            document.getElementById("an-update").remove();
+        }
+        document.getElementById("an-update").addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if(NotesForm.important.checked){
+                    NoteController.updateView(content.value, edit.previousSibling.getAttribute("aria-controls"), true);
+                    // If not already important
+                    if(! title.includes("imp__")){
+                        // Remove not important item
+                        localStorage.removeItem(title);
+                        title = 'an-imp__' + title.slice(3);
+                    }
+                    NotesForm.flushThenFill();
+                }
+                if(content.value != item){ // Content Updated
+                    NoteController.updateView(content.value, edit.previousSibling.getAttribute("aria-controls"));
+                    NotesForm.flushThenFill();
+                }
+                localStorage.setItem(title, content.value);
+                
+                
+        }); 
+    }
+
+
+    static delete(deleteb){
+        NotesForm.flushErrors();
+        if(deleteb.previousSibling.previousSibling.classList.contains("bg-danger")){
+            localStorage.removeItem(`an-imp__${deleteb.parentElement.innerText}`);
+        }else{
+            localStorage.removeItem(`an-${deleteb.parentElement.innerText}`);
+        }
+        deleteb.parentElement.parentElement.remove();
+        NotesForm.flush();
     }
 
     render(note){
@@ -230,6 +370,8 @@ class NoteController{
         
     }
 
+
+
     createUDButtons(id = null){
         const edit = document.createElement("i");
         edit.setAttribute("class", "bi bi-pencil-square an-btn an-update an-icon btn btn-primary m-2");
@@ -242,70 +384,14 @@ class NoteController{
         document.getElementById(id).appendChild(edit);
         document.getElementById(id).appendChild(deleteb);
         setTimeout(function(){
-           edit.addEventListener("click", (e)=>{
-                e.stopPropagation();
-                
-                let title = "";
-                let rendered_title = "";
-                if(deleteb.previousSibling.previousSibling.classList.contains("bg-danger")){
-                    title = `an-imp__${deleteb.parentElement.innerText}`;
-                    rendered_title = title.slice(8);
-                }else{
-                    title = `an-${edit.previousElementSibling.innerText}`;
-                    rendered_title = title.slice(3);
-                }
-                
-                const item = localStorage.getItem(title);
-                document.getElementById("an-title").value = rendered_title;
-                document.getElementById("an-title").disabled = true;
-                let content = document.getElementById("an-content");
-                content.value = item;
+            edit.addEventListener("click", function(e){
+                e.preventDefault();
+                NoteController.update(deleteb, edit);
+            });
 
-
-                const updateBtn = document.createElement("button");
-                updateBtn.setAttribute("id", "an-update");
-                updateBtn.setAttribute("class", "btn btn-danger mt-2 mx-2");
-                updateBtn.innerText = "Update";
-
-                const saveBtn = document.getElementById("an-save");
-                if(saveBtn != null){
-                    saveBtn.after(updateBtn);
-                    saveBtn.remove();
-                    const cancel = document.createElement("button");
-                    cancel.setAttribute("id", "an-cancel");
-                    cancel.setAttribute("class", "btn btn-primary mt-2 mx-2");
-                    cancel.innerText = "Cancel";
-                    document.getElementById("an-update").after(cancel);
-                    cancel.addEventListener("click", (e)=>{
-                        e.preventDefault();
-                        updateBtn.remove();
-                        NotesForm.flush();
-
-                        cancel.after(saveBtn);
-                        cancel.remove();
-                    });
-                }else{
-                    document.getElementById("an-update").after(updateBtn);
-                    document.getElementById("an-update").remove();
-                }
-                document.getElementById("an-update").addEventListener("click", (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        localStorage.setItem(title, content.value);
-                        if(content.value != item){ // Content Updated
-                            NoteController.update(content.value, edit.previousSibling.getAttribute("aria-controls"));
-                        }
-                }); 
-           });
-
-            deleteb.addEventListener("click", () => {
-                if(deleteb.previousSibling.previousSibling.classList.contains("bg-danger")){
-                    localStorage.removeItem(`an-imp__${deleteb.parentElement.innerText}`);
-                }else{
-                    localStorage.removeItem(`an-${deleteb.parentElement.innerText}`);
-                }
-                deleteb.parentElement.parentElement.remove();
-                NotesForm.flush();
+            deleteb.addEventListener("click", (e) => {
+                e.preventDefault();
+                NoteController.delete(deleteb);
             });
         }, 100);
     }
