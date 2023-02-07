@@ -70,6 +70,14 @@ class NotesForm{
         return document.getElementById(`an-${btn}`);
     }
 
+    static createUpdateBtn(){
+        const updateBtn = document.createElement("button");
+        updateBtn.setAttribute("id", "an-update");
+        updateBtn.setAttribute("class", "btn btn-danger mt-2 mx-2");
+        updateBtn.innerText = "Update";
+        return updateBtn;
+    }
+
     static flush(){
         this.title.value = "";
         this.content.value = "";
@@ -110,7 +118,9 @@ class NotesForm{
 
 
     static fill(){
-        this.createSaveBtn();
+        if(document.getElementById("an-save") == null){
+            this.createSaveBtn();
+        }
     }
 
     static flushThenFill(){
@@ -166,11 +176,25 @@ class NoteController{
     }
 
 
+    /**
+     * Update accordion on update btn click, 
+     * Insert Content, assign colors to the header (if important)
+     * 
+     * @param {*} content 
+     * @param {*} content_id 
+     * @param {*} important 
+     */
     static updateView(content, content_id, important = false){
+        const button = document.getElementById(content_id).previousSibling.children[0];
         document.getElementById(content_id).children[0].innerText = content;
         if(important){
-            document.getElementById(content_id).previousSibling.children[0].classList.add("bg-danger");
-            document.getElementById(content_id).previousSibling.children[0].classList.add("text-light");
+            button.classList.add("bg-danger");
+            button.classList.add("text-light");
+        }else{
+            if(button.classList.contains("bg-danger")){
+                button.classList.remove("bg-danger");
+                button.classList.remove("text-light");
+            }
         }
     }
 
@@ -188,6 +212,9 @@ class NoteController{
         
         // Fill the form
         const item = localStorage.getItem(title);
+        if(item == title){
+            item = null;
+        }
         NotesForm.title.value = rendered_title;
         NotesForm.title.disabled = true;
         if(title.includes("imp__")){
@@ -200,20 +227,15 @@ class NoteController{
         content.value = item;
 
         // Add Action Buttons
-        const updateBtn = document.createElement("button");
-        updateBtn.setAttribute("id", "an-update");
-        updateBtn.setAttribute("class", "btn btn-danger mt-2 mx-2");
-        updateBtn.innerText = "Update";
+        const updateBtn = NotesForm.createUpdateBtn();
+        
 
         const saveBtn = document.getElementById("an-save");
         if(saveBtn != null){
             saveBtn.after(updateBtn);
             saveBtn.remove();
 
-            const cancel = document.createElement("button");
-            cancel.setAttribute("id", "an-cancel");
-            cancel.setAttribute("class", "btn btn-primary mt-2 mx-2");
-            cancel.innerText = "Cancel";
+            const cancel = NotesForm.createBtn("cancel");
             updateBtn.after(cancel);
 
             cancel.addEventListener("click", (e)=>{
@@ -231,7 +253,7 @@ class NoteController{
         document.getElementById("an-update").addEventListener("click", (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
+                console.log("an-update");
                 if(NotesForm.important.checked){
                     NoteController.updateView(content.value, edit.previousSibling.getAttribute("aria-controls"), true);
                     // If not already important
@@ -241,14 +263,15 @@ class NoteController{
                         title = 'an-imp__' + title.slice(3);
                     }
                     NotesForm.flushThenFill();
+                }else{
+                    NoteController.updateView(content.value, edit.previousSibling.getAttribute("aria-controls"), false);
+                    NotesForm.flushThenFill();
                 }
                 if(content.value != item){ // Content Updated
                     NoteController.updateView(content.value, edit.previousSibling.getAttribute("aria-controls"));
                     NotesForm.flushThenFill();
                 }
                 localStorage.setItem(title, content.value);
-                
-                
         }); 
     }
 
@@ -261,7 +284,7 @@ class NoteController{
             localStorage.removeItem(`an-${deleteb.parentElement.innerText}`);
         }
         deleteb.parentElement.parentElement.remove();
-        NotesForm.flush();
+        NotesForm.flushThenFill();
     }
 
     render(note){
@@ -374,7 +397,7 @@ class NoteController{
 
     createUDButtons(id = null){
         const edit = document.createElement("i");
-        edit.setAttribute("class", "bi bi-pencil-square an-btn an-update an-icon btn btn-primary m-2");
+        edit.setAttribute("class", "bi bi-pencil-square an-btn an-edit an-icon btn btn-primary m-2");
         edit.setAttribute("id", `an-u-${id.slice(5)}`);
 
         const deleteb = document.createElement("i");
