@@ -9,6 +9,9 @@ export class NoteController{
     }
 
 
+    /**
+     * Render all the notes on load
+     */
     static index(){
         let title = "";
         let important;
@@ -31,6 +34,9 @@ export class NoteController{
     }
 
 
+    /**
+     * Validate & Store the created Note
+     */
     store(){
         let validator = new Validator();
         let result = validator.validate(this.note);
@@ -69,7 +75,12 @@ export class NoteController{
         }
     }
 
-
+    /**
+     * Render The Note Data to the form and update after click
+     * 
+     * @param {*} deleteb 
+     * @param {*} edit 
+     */
     static update(deleteb, edit){
         let title = "";
         let rendered_title = "";
@@ -83,6 +94,45 @@ export class NoteController{
         
         // Fill the form
         const item = NoteModel.get(title);
+        this.prototype.fillForm(item, title, rendered_title);
+        
+        document.getElementById("an-update").addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if(NotesForm.important.checked){
+                    NoteController.updateView(NotesForm.content.value, edit.previousSibling.getAttribute("aria-controls"), true);
+                    // If not already important
+                    if(! title.includes("imp__")){
+                        // Remove not important item
+                        NoteModel.delete(title);
+                        title = 'an-imp__' + title.slice(3);
+                    }
+                    NotesForm.flushThenFill();
+                }else{
+                    NoteController.updateView(NotesForm.content.value, edit.previousSibling.getAttribute("aria-controls"), false);
+                    if(title.includes("imp__")){
+                        // Remove important item
+                        NoteModel.delete(title);
+                        title = 'an-' + title.slice(8);
+                    }
+                    NotesForm.flushThenFill();
+                }
+                if(NotesForm.content.value != item){ // Content Updated
+                    NoteController.updateView(NotesForm.content.value, edit.previousSibling.getAttribute("aria-controls"));
+                    NotesForm.flushThenFill();
+                }
+                NoteModel.add(title, NotesForm.content.value);
+        }); 
+    }
+
+    /**
+     * Fill the note to be updated into the form
+     * 
+     * @param {*} item 
+     * @param {*} title 
+     * @param {*} rendered_title 
+     */
+    fillForm(item, title, rendered_title){
         if(item == title){
             item = null;
         }
@@ -121,31 +171,13 @@ export class NoteController{
             document.getElementById("an-update").after(updateBtn);
             document.getElementById("an-update").remove();
         }
-        document.getElementById("an-update").addEventListener("click", (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if(NotesForm.important.checked){
-                    NoteController.updateView(content.value, edit.previousSibling.getAttribute("aria-controls"), true);
-                    // If not already important
-                    if(! title.includes("imp__")){
-                        // Remove not important item
-                        NoteModel.delete(title);
-                        title = 'an-imp__' + title.slice(3);
-                    }
-                    NotesForm.flushThenFill();
-                }else{
-                    NoteController.updateView(content.value, edit.previousSibling.getAttribute("aria-controls"), false);
-                    NotesForm.flushThenFill();
-                }
-                if(content.value != item){ // Content Updated
-                    NoteController.updateView(content.value, edit.previousSibling.getAttribute("aria-controls"));
-                    NotesForm.flushThenFill();
-                }
-                NoteModel.add(title, content.value);
-        }); 
     }
 
-
+    /**
+     * Delete Note
+     * 
+     * @param {*} deleteb 
+     */
     static delete(deleteb){
         NotesForm.flushErrors();
         if(deleteb.previousSibling.previousSibling.classList.contains("bg-danger")){
@@ -157,6 +189,11 @@ export class NoteController{
         NotesForm.flushThenFill();
     }
 
+    /**
+     * Render a Single Note From the form & Create Actions Buttons (Update, Delete)
+     * 
+     * @param {*} note 
+     */
     render(note){
         let parent = document.getElementById("an-accordion");
 
@@ -210,6 +247,13 @@ export class NoteController{
         this.createUDButtons(`an-h-${note.id}`);
     }
 
+    /**
+     * Render Notes From Local Storage
+     * 
+     * @param {*} title 
+     * @param {*} content 
+     * @param {*} important 
+     */
     renderAll(title, content, important){
         let id = Math.round(Math.random() * 10_000 + 1);
         
@@ -264,7 +308,11 @@ export class NoteController{
     }
 
 
-
+    /**
+     * Create Update & Delete Buttons and attach Click Events to each
+     * 
+     * @param {*} id 
+     */
     createUDButtons(id = null){
         const edit = document.createElement("i");
         edit.setAttribute("class", "bi bi-pencil-square an-btn an-edit an-icon btn btn-primary m-2");
@@ -290,6 +338,11 @@ export class NoteController{
     }
 
 
+    /**
+     * Display from errors
+     * 
+     * @param {Array} errors 
+     */
 
     displayErrors(errors){
         this.removePreviousErrors();
@@ -317,7 +370,10 @@ export class NoteController{
         
     }
 
-
+    /**
+     * Remove Previous Erros in the form
+     * 
+     */
     removePreviousErrors(){
         let errors = document.querySelectorAll(".an-error");
         if(errors != null){

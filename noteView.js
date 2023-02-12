@@ -7,11 +7,20 @@ export class NotesForm{
     static content = document.getElementById("an-content");
     static important = document.getElementById("an-important");
 
-
+    /**
+     * Get a specified button
+     * 
+     * @param {*} btn 
+     * @returns HTMLElement
+     */
     static getBtn(btn){
         return document.getElementById(`an-${btn}`);
     }
 
+    /**
+     * Create a save button along with CLick event + listener
+     * 
+     */
     static createSaveBtn(){
         const button = document.createElement("button");
         button.setAttribute("id", `an-save`);
@@ -40,6 +49,12 @@ export class NotesForm{
         }, 100);
     }
 
+    /**
+     * Create a button
+     * 
+     * @param {String} btn 
+     * @returns HtmlElement
+     */
     static createBtn(btn){
         const button = document.createElement("button");
         button.setAttribute("id", `an-${btn}`);
@@ -49,6 +64,11 @@ export class NotesForm{
         return document.getElementById(`an-${btn}`);
     }
 
+    /**
+     * Creatre Update Buttons
+     * 
+     * @returns HtmlElement
+     */
     static createUpdateBtn(){
         const updateBtn = document.createElement("button");
         updateBtn.setAttribute("id", "an-update");
@@ -57,6 +77,9 @@ export class NotesForm{
         return updateBtn;
     }
 
+    /**
+     * Reset the form to its defaults
+     */
     static flush(){
         this.title.value = "";
         this.content.value = "";
@@ -84,7 +107,9 @@ export class NotesForm{
 
     }
 
-
+    /**
+     * Remove Errors from the forms
+     */
     static flushErrors(){
         let errors = document.querySelectorAll(".an-error");
         if(errors != null){
@@ -95,13 +120,18 @@ export class NotesForm{
     }
 
 
-
+    /**
+     * Fill The form with (SAVE BUTTON)
+     */
     static fill(){
         if(document.getElementById("an-save") == null){
             this.createSaveBtn();
         }
     }
 
+    /**
+     * Reset the form to its defaults, then add save button
+     */
     static flushThenFill(){
         this.flush();
         this.fill();
