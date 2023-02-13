@@ -15,6 +15,7 @@ export class NoteController{
      */
     static index(){
         NotesForm.createForm();
+        NotesForm.getInputs();
         this.prototype.listen();
         let title = "";
         let important;
@@ -36,6 +37,10 @@ export class NoteController{
         }
     }
 
+
+    /**
+     * After rendering form, listen for click event
+     */
     listen(){
         document.getElementById('an-save').addEventListener("click", (e)=>{
             e.preventDefault();
@@ -157,6 +162,7 @@ export class NoteController{
         if(item == title){
             item = null;
         }
+        console.log(NotesForm.title.value);
         NotesForm.title.value = rendered_title;
         NotesForm.title.disabled = true;
         if(title.includes("imp__")){
@@ -393,7 +399,6 @@ export class NoteController{
 
     /**
      * Remove Previous Erros in the form
-     * 
      */
     removePreviousErrors(){
         let errors = document.querySelectorAll(".an-error");

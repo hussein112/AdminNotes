@@ -2,10 +2,23 @@ import { Note } from './note.js';
 import { NoteController } from './noteController.js';
 
 export class NotesForm{
-    static title = document.getElementById("an-title");
-    static content = document.getElementById("an-content");
-    static important = document.getElementById("an-important");
+    
+    static title;
+    static content;
+    static important;
 
+    /**
+     * After the form has been rendered, get the form fields.
+     */
+    static getInputs(){
+        this.title = document.getElementById("an-title");
+        this.content = document.getElementById("an-content");
+        this.important = document.getElementById("an-important");
+    }
+
+    /**
+     * Create the HTML form
+     */
     static createForm(){
         const form = document.createElement("form");
         const title = document.createElement("input");
@@ -33,9 +46,14 @@ export class NotesForm{
         this.createSaveBtn();
 
         this.prototype.createAccordion(container);
-        return true;
     }
 
+
+    /**
+     * Create The accordion element to contain the notes.
+     * 
+     * @param {HTMLObject} parent 
+     */
     createAccordion(parent){
         const container = document.createElement("div");
         container.setAttribute("class", "an-pending mt-2 mx-5");
@@ -49,6 +67,13 @@ export class NotesForm{
         parent.appendChild(container);
     }
 
+    /**
+     * Create bootstrap checkbox & set the checkbox input attributes
+     * 
+     * @param {HTMLObject} checkBoxContainer 
+     * @param {HTMLObject} checkBox 
+     * @param {HTMLObject} checkBoxLabel 
+     */
     setCheckBoxAttributes(checkBoxContainer, checkBox, checkBoxLabel){
         // <div>
         checkBoxContainer.setAttribute("class", "form-check mt-2");
@@ -69,6 +94,12 @@ export class NotesForm{
         checkBoxContainer.appendChild(checkBoxLabel);
     }
 
+    /**
+     * Set the <textarea> attributes
+     * -cols, rows, class, id
+     * 
+     * @param {HTMLObject} content 
+     */
     setContentAttributes(content){
         content.setAttribute("id", "an-content");
         content.setAttribute("class", "form-control mt-2");
@@ -77,6 +108,12 @@ export class NotesForm{
         content.setAttribute("rows", "6");
     }
 
+    /**
+     * Set the <input> title attributes
+     * - id, class, placeholder
+     * 
+     * @param {HTMLObject} title 
+     */
     setTitleAttributes(title){
         title.setAttribute("id", "an-title");
         title.setAttribute("class", "form-control mt-2");
@@ -84,6 +121,12 @@ export class NotesForm{
 
     }
 
+    /**
+     * Set the <form> attribute
+     * -class, id
+     * 
+     * @param {HTMLObject} form 
+     */
     setFormAttributes(form){
         form.setAttribute("class", "mx-5");
         form.setAttribute("id", "an-notes");
@@ -92,8 +135,8 @@ export class NotesForm{
     /**
      * Get a specified button
      * 
-     * @param {*} btn 
-     * @returns HTMLElement
+     * @param {HTMLObject} btn 
+     * @returns HtmlElement
      */
     static getBtn(btn){
         return document.getElementById(`an-${btn}`);
@@ -101,7 +144,6 @@ export class NotesForm{
 
     /**
      * Create a save button along with CLick event + listener
-     * 
      */
     static createSaveBtn(){
         const button = document.createElement("button");
