@@ -1,6 +1,7 @@
 import { NoteModel } from './noteModel.js';
 import { Validator } from './validator.js'; 
 import { NotesForm } from './noteView.js';
+import { Note } from './note.js';
 
 export class NoteController{
 
@@ -13,6 +14,8 @@ export class NoteController{
      * Render all the notes on load
      */
     static index(){
+        NotesForm.createForm();
+        this.prototype.listen();
         let title = "";
         let important;
 
@@ -33,6 +36,24 @@ export class NoteController{
         }
     }
 
+    listen(){
+        document.getElementById('an-save').addEventListener("click", (e)=>{
+            e.preventDefault();
+            e.stopPropagation();
+        
+            const id = Math.round(Math.random() * 1000 + 1);
+        
+            let note = new Note(
+                id, 
+                document.getElementById("an-title").value,
+                document.getElementById("an-content").value,
+                document.getElementById("an-important").checked
+            );
+        
+            const saveNote = new NoteController(note);
+            saveNote.store();
+        });
+    }
 
     /**
      * Validate & Store the created Note
