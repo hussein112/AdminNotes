@@ -16,7 +16,7 @@ export class NoteController{
     static index(){
         NotesForm.createForm();
         NotesForm.getInputs();
-        this.prototype.listen();
+        document.getElementById("an-save").onclick = addEventListener("click", NoteController.handle, {once: true});
         let title = "";
         let important;
 
@@ -41,23 +41,21 @@ export class NoteController{
     /**
      * After rendering form, listen for click event
      */
-    listen(){
-        document.getElementById('an-save').addEventListener("click", (e)=>{
-            e.preventDefault();
-            e.stopPropagation();
-        
-            const id = Math.round(Math.random() * 1000 + 1);
-        
-            let note = new Note(
-                id, 
-                document.getElementById("an-title").value,
-                document.getElementById("an-content").value,
-                document.getElementById("an-important").checked
-            );
-        
-            const saveNote = new NoteController(note);
-            saveNote.store();
-        });
+    static handle(e){
+        e.preventDefault();
+        e.stopPropagation();
+    
+        const id = Math.round(Math.random() * 1000 + 1);
+    
+        let note = new Note(
+            id, 
+            document.getElementById("an-title").value,
+            document.getElementById("an-content").value,
+            document.getElementById("an-important").checked
+        );
+    
+        const saveNote = new NoteController(note);
+        saveNote.store();
     }
 
     /**
@@ -76,6 +74,7 @@ export class NoteController{
             NoteModel.add(title, this.note.content);
             this.render(this.note);
         }
+        return true;
     }
 
 
@@ -126,28 +125,23 @@ export class NoteController{
                 e.preventDefault();
                 e.stopPropagation();
                 if(NotesForm.important.checked){
-                    NoteController.updateView(NotesForm.content.value, edit.previousSibling.getAttribute("aria-controls"), true);
                     // If not already important
                     if(! title.includes("imp__")){
                         // Remove not important item
                         NoteModel.delete(title);
                         title = 'an-imp__' + title.slice(3);
                     }
-                    NotesForm.flushThenFill();
                 }else{
-                    NoteController.updateView(NotesForm.content.value, edit.previousSibling.getAttribute("aria-controls"), false);
                     if(title.includes("imp__")){
                         // Remove important item
                         NoteModel.delete(title);
                         title = 'an-' + title.slice(8);
                     }
-                    NotesForm.flushThenFill();
                 }
-                if(NotesForm.content.value != item){ // Content Updated
-                    NoteController.updateView(NotesForm.content.value, edit.previousSibling.getAttribute("aria-controls"));
-                    NotesForm.flushThenFill();
-                }
+                NoteController.updateView(NotesForm.content.value, edit.previousSibling.getAttribute("aria-controls"), NotesForm.important.checked);
                 NoteModel.add(title, NotesForm.content.value);
+                NotesForm.flushThenFill();
+
         }); 
     }
 
@@ -162,7 +156,6 @@ export class NoteController{
         if(item == title){
             item = null;
         }
-        console.log(NotesForm.title.value);
         NotesForm.title.value = rendered_title;
         NotesForm.title.disabled = true;
         if(title.includes("imp__")){
@@ -366,7 +359,7 @@ export class NoteController{
 
 
     /**
-     * Display from errors
+     * Display form errors
      * 
      * @param {Array} errors 
      */

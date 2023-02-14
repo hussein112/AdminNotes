@@ -5,6 +5,12 @@ export class Validator{
         content: []
     };
 
+    /**
+     * Return array of errors for the content
+     * 
+     * @param {*} content 
+     * @returns Array
+     */
     validateContent(content){
         if(content == "" || content == null){
             this.errors.content.push("* Content Cannot be Empty");
@@ -13,7 +19,12 @@ export class Validator{
         return this.errors;
     }
 
-    
+    /**
+     * Returns array of errors for the whole note(title, content)
+     * 
+     * @param {*} note 
+     * @returns Array
+     */
     validate(note){
         this.errors.title = [];
         this.errors.content = [];
@@ -37,7 +48,14 @@ export class Validator{
     }
 
 
+    /**
+     * Check the local storage if the title is unique.
+     * 
+     * @param {String} title 
+     * @returns 
+     */
     unique(title){
+        console.log(NoteModel.get(title));
         if(NoteModel.get(title) == null){
             return true;
         }

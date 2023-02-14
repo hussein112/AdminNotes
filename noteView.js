@@ -136,7 +136,7 @@ export class NotesForm{
      * Get a specified button
      * 
      * @param {HTMLObject} btn 
-     * @returns HtmlElement
+     * @returns HTMLButtonElement
      */
     static getBtn(btn){
         return document.getElementById(`an-${btn}`);
@@ -154,22 +154,7 @@ export class NotesForm{
         
         setTimeout(function(){
             let s = document.getElementById("an-save");
-            s.addEventListener("click", function(e){
-                e.preventDefault();
-                e.stopPropagation();
-            
-                const id = Math.round(Math.random() * 1000 + 1);
-            
-                let note = new Note(
-                    id, 
-                    document.getElementById("an-title").value,
-                    document.getElementById("an-content").value,
-                    document.getElementById("an-important").checked
-                );
-            
-                const saveNote = new NoteController(note);
-                saveNote.store();
-            });
+            // s.addEventListener("click", function(e) { NoteController.handle(e) }, {once: true});
         }, 100);
     }
 
@@ -177,7 +162,7 @@ export class NotesForm{
      * Create a button
      * 
      * @param {String} btn 
-     * @returns HtmlElement
+     * @returns HTMLButtonElement
      */
     static createBtn(btn){
         const button = document.createElement("button");
