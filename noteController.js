@@ -41,7 +41,6 @@ export class NoteController{
      * After rendering form, listen for click event
      */
     static handle(e){
-        console.log("Clicked");
         e.preventDefault();
         e.stopPropagation();
     
