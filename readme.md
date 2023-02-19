@@ -13,8 +13,8 @@ Simple Local Storage Based CRUD Notes Plugin.
 > Icons Will Be loaded, if not found
 
 1. Download the file, or Add the cdn
-    - > ``<script src="https://cdn.jsdelivr.net/gh/hussein112/AdminNotes@1.0/admin-note.js" type="module"></script>``
-    - > ``<script src="https://cdn.jsdelivr.net/gh/hussein112/AdminNotes@1.0/admin-note.min.js" type="module"></script>``
+    - > ``<script src="https://cdn.jsdelivr.net/gh/hussein112/AdminNotes/admin-note.js" type="module"></script>``
+    - > ``<script src="https://cdn.jsdelivr.net/gh/hussein112/AdminNotes/admin-note.min.js" type="module"></script>``
 2. Insert the wrapper
   ``<div id="an-notes"></div>``
 3. Done!
