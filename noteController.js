@@ -67,6 +67,7 @@ export class NoteController{
         if(result['content'].length > 0 || result['title'].length > 0){
             this.displayErrors(result);
         }else{
+            this.removePreviousErrors();
             let title = `an-${this.note.title}`;
             if(this.note.important){
                 title = "an-imp__" + this.note.title.trimEnd();
