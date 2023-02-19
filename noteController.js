@@ -16,7 +16,6 @@ export class NoteController{
     static index(){
         NotesForm.createForm();
         NotesForm.getInputs();
-        document.getElementById("an-save").onclick = addEventListener("click", NoteController.handle, {once: true});
         let title = "";
         let important;
 
@@ -42,6 +41,7 @@ export class NoteController{
      * After rendering form, listen for click event
      */
     static handle(e){
+        console.log("Clicked");
         e.preventDefault();
         e.stopPropagation();
     

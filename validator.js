@@ -55,7 +55,6 @@ export class Validator{
      * @returns 
      */
     unique(title){
-        console.log(NoteModel.get(title));
         if(NoteModel.get(title) == null){
             return true;
         }

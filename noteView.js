@@ -1,4 +1,3 @@
-import { Note } from './note.js';
 import { NoteController } from './noteController.js';
 
 export class NotesForm{
@@ -154,7 +153,7 @@ export class NotesForm{
         
         setTimeout(function(){
             let s = document.getElementById("an-save");
-            // s.addEventListener("click", function(e) { NoteController.handle(e) }, {once: true});
+            s.addEventListener("click", NoteController.handle);
         }, 100);
     }
 

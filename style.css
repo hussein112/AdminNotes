@@ -12,10 +12,3 @@
 .an-update{
     right: 80px;
 } */
-
-
-.an-pending h2 button{
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
