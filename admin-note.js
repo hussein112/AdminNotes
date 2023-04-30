@@ -1,9 +1,10 @@
 import { NoteController } from './noteController.js'; 
 
-window.onload = function(){
+setTimeout(function(){
     NoteController.index();
     loadCss();
-}
+}, 2500);
+
 
 function loadCss () {
     var ss = document.styleSheets;
